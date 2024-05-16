@@ -6,6 +6,9 @@
 
 - make sure you have node installed
 - run `npm install`
+- make copy of env.example file and rename it to .env --> (important)
+- create a "tmp" directory at root. required by sqlite db --> (important)
+- run `node ace migration:fresh`
 - run `npm run dev`
 - go to http://localhost:3333/
 - try uploading a video. once uploaded you can varify uploaded chunks in uploads folder at project root.
