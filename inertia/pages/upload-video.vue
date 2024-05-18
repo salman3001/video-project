@@ -7,16 +7,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
+import { ref } from 'vue'
+import ChunkFileUpload from '~/components/ChunkFileUpload.vue'
 
-const form = useForm({
-  name: '',
-  file: '',
-})
-
-const submit = () => {
-  form.post('/upload')
-}
+const files = ref<File[]>([])
 </script>
 
 <template>
@@ -27,13 +22,31 @@ const submit = () => {
   <br />
   <div>
     <Link href="/">
-      <button class="btn btn-primary">Go Back</button>
+      <button class="btn">Go Back</button>
     </Link>
   </div>
   <br />
   <br />
-  <form action="" class="flex flex-col gap-4" @submit.prevent="submit">
-    <div class="flex flex-col">
+  <div action="" class="flex flex-col gap-4">
+    <div v-for="(file, i) in files" :key="i">
+      <ChunkFileUpload :file-to-upload="file" />
+    </div>
+    <div>
+      <label for="upload-btn" class="btn btn-primary">Add video</label>
+      <input
+        id="upload-btn"
+        name="upload-btn"
+        type="file"
+        class="hidden"
+        accept=".mp4"
+        @change="
+          (e) => {
+            files.push(e!.target!.files[0])
+          }
+        "
+      />
+    </div>
+    <!-- <div class="flex flex-col">
       <label for="name">Name</label>
       <input
         type="text"
@@ -65,6 +78,6 @@ const submit = () => {
       <progress v-if="form.progress" :value="form.progress.percentage" max="100">
         {{ form.progress.percentage }}%
       </progress>
-    </div>
-  </form>
+    </div> -->
+  </div>
 </template>

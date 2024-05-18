@@ -18,6 +18,7 @@ router.get('/', [VideosController, 'index']).as('home')
 router.on('/upload').renderInertia('upload-video').as('upload')
 router.post('/upload', [VideosController, 'store']).as('store')
 router.get('/view-video/:id', [VideosController, 'show']).as('show')
+router.post('/upload-chunks', [VideosController, 'uploadChunk']).as('upload.chunk')
 
 // serving uploads
 const PATH_TRAVERSAL_REGEX = /(?:^|[\\/])\.\.(?:[\\/]|$)/
