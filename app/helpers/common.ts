@@ -69,4 +69,6 @@ export function concatenateChunks(chunksDir: string) {
   }
 
   console.log(`MP4 chunks concatenated successfully. Output file: ${chunksDir}`)
+
+  return outputPath
 }

@@ -1,12 +1,11 @@
 import { exec } from 'node:child_process'
 
-function processJob(jobData: { filePath: string }) {
+function processJob(jobData) {
   return new Promise((resolve, reject) => {
+
     // Placeholder for the actual job logic
     console.log(`Processing job: ${JSON.stringify(jobData)}`)
-
-    const outputFilePath = `${jobData.filePath}_in.mpd`
-    const command = `ffmpeg -i ${jobData.filePath} -c:v libx265 -crf 23 -x265-params keyint=24:no-scenecut ${outputFilePath}`
+    const command = `ffmpeg -i ${jobData.videoFile} -c:v libx265 -b:v 500k -crf 23 -c:a aac -b:a 128k ${jobData.outputPath}`
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -22,7 +21,7 @@ function processJob(jobData: { filePath: string }) {
   })
 }
 
-async function startProcessing(jobData: any) {
+async function startProcessing(jobData) {
   try {
     await processJob(jobData)
     console.log('Job processed successfully')

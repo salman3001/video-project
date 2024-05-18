@@ -6,6 +6,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import vine from '@vinejs/vine'
 import { existsSync, mkdirSync } from 'node:fs'
+import bull from '@acidiney/bull-queue/services/main'
+import ConvertVideoJob, { ConvertVideoPayload } from '#app/jobs/convert_video'
 
 @inject()
 export default class VideosController {
@@ -67,7 +69,11 @@ export default class VideosController {
     })
 
     if (payload.chunkIndex === payload.totalChunks - 1) {
-      concatenateChunks(outputDir)
+     const uploadedFile =  concatenateChunks(outputDir)
+     await app.booted(async () => {
+      bull.dispatch(ConvertVideoJob.name,{videoFile:uploadedFile} as ConvertVideoPayload)
+    })
+     
       return response.json({
         completed: true,
       })

@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { os } from 'os-utils'
+import { cpuUsage } from 'os-utils'
 
 const MAX_WORKERS = 4
 const CPU_LIMIT = 10 // CPU limit per worker in percentage
@@ -8,7 +8,7 @@ let activeWorkers = 0
 const workers: any[] = []
 
 export function startWorker(workerFilePath: string, data: any) {
-  os.cpuUsage((cpuPercentage: number) => {
+  cpuUsage((cpuPercentage: number) => {
     if (cpuPercentage * 100 < MAX_WORKERS * CPU_LIMIT && activeWorkers < MAX_WORKERS) {
       const worker = spawn('cpulimit', [
         '-l',
@@ -18,6 +18,9 @@ export function startWorker(workerFilePath: string, data: any) {
         workerFilePath,
         JSON.stringify(data),
       ])
+
+    console.log('worker spawned');
+
 
       worker.stdout.on('data', (returnedData: any) => {
         console.log(`Worker stdout: ${returnedData}`)
@@ -33,6 +36,7 @@ export function startWorker(workerFilePath: string, data: any) {
         activeWorkers--
       })
 
+
       workers.push(worker)
       activeWorkers++
       console.log(`Started worker, active workers: ${activeWorkers}`)
@@ -43,11 +47,11 @@ export function startWorker(workerFilePath: string, data: any) {
 }
 
 function monitorWorkers() {
-  os.cpuUsage((cpuPercentage: number) => {
-    console.log(`CPU Usage: ${cpuPercentage * 100}%`)
+  cpuUsage((cpuPercentage: number) => {
+    console.log(`CPU Usage: ${(cpuPercentage * 100).toFixed(2)}%`)
     console.log(`Active Workers: ${activeWorkers}`)
   })
 }
 
 // Monitor CPU usage and adjust workers every 5 seconds
-setInterval(monitorWorkers, 5000)
+// setInterval(monitorWorkers, 5000)
