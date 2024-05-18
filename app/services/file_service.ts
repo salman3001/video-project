@@ -17,7 +17,7 @@ import path from 'node:path'
 import sharp from 'sharp'
 // @ts-ignore
 import ffmpeg from 'fluent-ffmpeg-7'
-import ws from './ws.js'
+
 import { DOMParser, XMLSerializer } from 'xmldom'
 
 @inject()

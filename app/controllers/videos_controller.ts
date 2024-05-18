@@ -6,8 +6,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import vine from '@vinejs/vine'
 import { existsSync, mkdirSync } from 'node:fs'
-import bull from '@acidiney/bull-queue/services/main'
+// import bull from '@acidiney/bull-queue/services/main'
 import ConvertVideoJob, { ConvertVideoPayload } from '#app/jobs/convert_video'
+import { startWorker } from '#app/helpers/deploy_workers'
+import { cuid } from '@adonisjs/core/helpers'
 
 @inject()
 export default class VideosController {
@@ -69,11 +71,11 @@ export default class VideosController {
     })
 
     if (payload.chunkIndex === payload.totalChunks - 1) {
-     const uploadedFile =  concatenateChunks(outputDir)
-     await app.booted(async () => {
-      bull.dispatch(ConvertVideoJob.name,{videoFile:uploadedFile} as ConvertVideoPayload)
-    })
-     
+      const uploadedFile = concatenateChunks(outputDir)
+      //  await app.booted(async () => {
+      //   bull.dispatch(ConvertVideoJob.name,{videoFile:uploadedFile} as ConvertVideoPayload)
+      // })
+
       return response.json({
         completed: true,
       })
@@ -82,5 +84,14 @@ export default class VideosController {
         nextIndex: payload.chunkIndex + 1,
       })
     }
+  }
+
+  async temp({ response }: HttpContext) {
+    const workerPath = app.makePath('app', 'helpers', 'conversion_worker.js')
+    const videoFile = app.makePath('tmp', 'input', 'Timeline-2024-04-27-12.00.29.689.avi')
+    const outputDir = app.makePath('tmp', 'output')
+
+    startWorker(workerPath, { jobId: cuid(), outputDir: outputDir, videoFile: videoFile })
+    return response.ok('ok')
   }
 }

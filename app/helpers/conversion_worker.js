@@ -1,43 +1,62 @@
-import { exec } from 'node:child_process'
+import { existsSync, mkdirSync } from 'node:fs'
+import path from 'node:path'
+import { encodeVideo } from './encode_video.js'
+import { parentPort, workerData } from 'node:worker_threads'
 
 function processJob(jobData) {
   return new Promise((resolve, reject) => {
+    const chunksDir = path.join(jobData.outputDir, 'chunks')
+
+    if (!existsSync(chunksDir)) {
+      mkdirSync(chunksDir)
+    }
 
     // Placeholder for the actual job logic
     console.log(`Processing job: ${JSON.stringify(jobData)}`)
-    const command = `ffmpeg -i ${jobData.videoFile} -c:v libx265 -b:v 500k -crf 23 -c:a aac -b:a 128k ${jobData.outputPath}`
+    const outputPath = path.join(jobData.outputDir, 'main.mpd')
 
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
+    encodeVideo(jobData.videoFile, outputPath, '1000k', '1280x720', jobData.outputDir, 'medium')
+      .then(() => {
+        resolve()
+      })
+      .catch((error) => {
         reject(error)
-        return
-      }
-      if (stderr) {
-        reject(new Error(stderr))
-        return
-      }
-      resolve(stdout)
-    })
+      })
+    // const command = `ffmpeg -i "${jobData.videoFile}"
+    //                   -c:v libx265
+    //                   -b:v 500k
+    //                   -crf 23
+    //                   -c:a aac
+    //                   -b:a 128k
+    //                   -init_seg_name ${initSegmentPath},
+    //                   -media_seg_name ${mediaSegmentPath},
+    //                   "${jobData.outputDir+'.mpd'}"`
+
+    // exec(command, (error, stdout, stderr) => {
+    //   if (error) {
+    //     reject(error)
+    //     return
+    //   }
+    //   if (stderr) {
+    //     reject(new Error(stderr))
+    //     return
+    //   }
+    //   resolve(stdout)
+    // })
   })
 }
 
 async function startProcessing(jobData) {
   try {
     await processJob(jobData)
-    console.log('Job processed successfully')
-    if (process.send) {
-      process.send({ success: true, jobData })
-    }
+    console.log('Video encoding completed successfully.')
+    parentPort.postMessage({ success: true, jobId: jobData.jobId })
   } catch (error) {
-    console.error('Error processing job:', error)
-    if (process.send) {
-      process.send({ success: false, jobData, error: error.message })
-    }
+    console.error('Error encoding video:', error)
+    parentPort.postMessage({ success: false, jobId: jobData.jobId })
   } finally {
     process.exit()
   }
 }
 
-// Get the job data from the arguments
-const jobData = JSON.parse(process.argv[2])
-startProcessing(jobData)
+startProcessing(workerData)

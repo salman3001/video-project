@@ -6,3 +6,9 @@ export type ImageType = {
 export type VideoType = {
   url: string
 }
+
+export interface VideoJobData {
+  jobId: string
+  outputDir: string
+  videoFile: string
+}

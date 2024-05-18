@@ -10,7 +10,11 @@ export default defineConfig({
   | will be scanned automatically from the "./commands" directory.
   |
   */
-  commands: [() => import('@adonisjs/core/commands'), () => import('@adonisjs/lucid/commands'), () => import('@acidiney/bull-queue/commands')],
+  commands: [
+    () => import('@adonisjs/core/commands'),
+    () => import('@adonisjs/lucid/commands'),
+    () => import('@acidiney/bull-queue/commands'),
+  ],
 
   /*
   |--------------------------------------------------------------------------
@@ -37,7 +41,7 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/lucid/database_provider'),
     () => import('@adonisjs/inertia/inertia_provider'),
-    () => import('@acidiney/bull-queue/queue_provider')
+    // () => import('@acidiney/bull-queue/queue_provider')
   ],
 
   /*
@@ -48,7 +52,11 @@ export default defineConfig({
   | List of modules to import before starting the application.
   |
   */
-  preloads: [() => import('#start/routes'), () => import('#start/kernel'), () => import('#start/ws')],
+  preloads: [
+    () => import('#start/routes'),
+    () => import('#start/kernel'),
+    () => import('#start/ws'),
+  ],
 
   /*
   |--------------------------------------------------------------------------
