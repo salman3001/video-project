@@ -8,8 +8,8 @@
 - run `npm install`
 - run `npm run dev`
 - go to http://localhost:3333/
-- try uploading a video. once uploaded you can varify uploaded chunks in uploads folder at project root.
-- video will apear in list. you can view it . try changing the quality of the video. you can inspect network tab to see chunks streaming on demand.
+- add 2 to 3 videos and uload. varify netwrok tab that data is uploaded in chunks.
+- <mark>(this will work oonly in main branch)</mark> --> video will apear in list. you can view it . try changing the quality of the video. you can inspect network tab to see chunks streaming on demand.
 
 ## Notes
 
